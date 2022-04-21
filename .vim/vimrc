@@ -1,0 +1,9 @@
+Plugin 'SirVer/ultisnips'
+Plugin 'honza/vim-snippets'
+" 如果需要更多配置可以在vimrc中输入下面的，不配置使用默认的设置
+let g:UltiSnipsExpandTrigger = "<tab>"
+let g:UltiSnipsListSnippets = "<c-tab>"
+let g:UltiSnipsJumpForwardTrigger = "<tab>"
+let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
+let g:UltiSnipsSnippetDirectories=[$HOME.'/.vim/bundle/vim-snippets/UltiSnips']
+
