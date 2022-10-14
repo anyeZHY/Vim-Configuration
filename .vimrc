@@ -47,14 +47,19 @@ filetype plugin indent on    " required
 set rtp+=~/.vim/bundle/Vundle.vim  
 call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
-Plugin 'https://github.com/vim-latex/vim-latex'
+" Plugin 'https://github.com/vim-latex/vim-latex'
+Plugin 'lervag/vimtex'
 Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
 Plugin 'Chiel92/vim-autoformat'
 Plugin 'https://github.com/bling/vim-airline'
-Plugin 'kien/rainbow_parentheses.vim'
 Plugin 'https://github.com/scrooloose/nerdtree'
 Plugin 'crusoexia/vim-monokai'
+Plugin 'kien/rainbow_parentheses.vim'
+Plugin 'arzg/vim-colors-xcode'
+Plugin 'aclements/latexrun'
+" Plugin 'http://users.phys.psu.edu/~collins/software/latexmk-jcc'
+Plugin 'matze/vim-tex-fold'
 call vundle#end()            " required
 filetype plugin indent on    " required
 
@@ -66,29 +71,79 @@ nnoremap <C-S> <C-W><C-S>
 
 "-------------------------------------------------------------------
 " LaTeX Settings
-set grepprg=grep\ -nH\ $*
+filetype plugin indent on
+" This enables Vim's and neovim's syntax-related features. Without this, some
+" VimTeX features will not work (see ":help vimtex-requirements" for more
+" info).
+syntax enable
+
+let g:vimtex_view_method = 'skim'
+let g:vimtex_view_skim_activate = 1
+let g:vimtex_view_skim_sync = 1
+
+
+" VimTeX uses latexmk as the default compiler backend. If you use it, which is
+" strongly recommended, you probably don't need to configure anything. If you
+" want another compiler backend, you can change it as follows. The list of
+" supported backends and further explanation is provided in the documentation,
+" see ":help vimtex-compiler".
+" let g:vimtex_compiler_method = 'latexrun'
+
+let g:vimtex_imaps_leader = ';'
+map <Leader><Leader> :w<CR><bar><Leader>ll
+map <space><space> :w<CR>
+let g:vimtex_complete_close_braces = 1
+let g:tex_indent_brace=0
+inoremap {      {}<Left>
+inoremap {{     {
+inoremap {}     {}
+inoremap <D-/> <Esc>ggi
+
+"LaTeX配置
 let g:tex_flavor='latex'
-set iskeyword+=:
-"autocmd Filetype tex setl updatetime=1
-let g:Tex_ViewRule_pdf = 'skim'
-let g:livepreview_previewer = 'open -a Skim'
-let g:Tex_Leader=';'
+let g:vimtex_texcount_custom_arg=' -ch -total'
+"映射VimtexCountWords！\lw 在命令模式下enter此命令可统计中英文字符的个数
+au FileType tex map <buffer> <silent>  <leader>lw :VimtexCountWords!  <CR><CR>
 
-"中文支持
-let g:Tex_CompileRule_pdf = 'xelatex -synctex=1 --interaction=nonstopmode $*'
-let g:vimtex_compiler_latexmk_engines = {'_':'-xelatex'}
-let g:vimtex_compiler_latexrun_engines ={'_':'xelatex'}
+"这里是LaTeX编译引擎的设置，这里默认LaTeX编译方式为-pdf(pdfLaTeX),
+"vimtex提供了magic comments来为文件设置编译方式
+"例如，我在tex文件开头输入 % !TEX program = xelatex   即指定-xelatex （xelatex）编译文件
+let g:vimtex_compiler_latexmk_engines = {
+    \ '_'                : '-pdf',
+    \ 'pdflatex'         : '-pdf',
+    \ 'dvipdfex'         : '-pdfdvi',
+    \ 'lualatex'         : '-lualatex',
+    \ 'xelatex'          : '-xelatex',
+    \ 'context (pdftex)' : '-pdf -pdflatex=texexec',
+    \ 'context (luatex)' : '-pdf -pdflatex=context',
+    \ 'context (xetex)'  : '-pdf -pdflatex=''texexec --xtx''',
+    \}
+"这里是设置latexmk工具的可选参数
+let g:vimtex_compiler_latexmk = {
+    \ 'build_dir' : '',
+    \ 'callback' : 1,
+    \ 'continuous' : 1,
+    \ 'executable' : 'latexmk',
+    \ 'hooks' : [],
+    \ 'options' : [
+    \   '-verbose',
+    \   '-file-line-error',
+    \   '-shell-escape',
+    \   '-synctex=1',
+    \   '-interaction=nonstopmode',
+    \ ],
+    \}
 
-" bib调试
-let g:Tex_MultipleCompileFormats='pdf,bibtex,pdf'
-
-"
-" remove warnings
-let g:vimtex_quickfix_ignore_filters = [
-  \'Package',
-  \]
-let g:vimtex_quickfix_enabled = 0
+"编译过程中忽略警告信息
 let g:vimtex_quickfix_open_on_warning=0
+let g:vimtex_quickfix_ignore_filters = [
+      \ 'Underfull',
+      \ 'Overfull',
+      \]
+
+" vim-colors-xcode
+let g:match_paren_style = 1
+let g:green_comments = 1
 
 "-------------------------------------------------------------------
 "UltiSnips
